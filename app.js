@@ -1,30 +1,30 @@
 const express = require('express');
- const app = express();
- const userRoute = require('./src/routes/User');
+const app = express();
+const userRoute = require('./src/routes/User');
 const config = require('./src/config/database');
- const port = 4000;
- const mongoose= require("mongoose");
- const bodyParser = require("body-parser");
+const port = 4000;
+const mongoose = require("mongoose");
 
+// Use express.json() for parsing JSON bodies
+app.use(express.json());
 
- app.use('/api/v1/chat',userRoute)
+app.use('/api/v1/chat/users', userRoute);
 
- app.use(bodyParser.json());
- app.use(bodyParser.urlencoded({ extended: true }));
-// creating a connection between the controller and database
-mongoose.connect(config.database,{
-    //useNEW collects data then formats it
+mongoose.connect(config.database, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-})
-const db= mongoose.connection
-// checking if db has connected
-db.once("open", ()=>{
-console.log("connected to db")
-})
-db.on("error",(err)=>{
-console.error(err)
-})
- app.listen( port,()=>{
-     console.log(`listening to port ${port}`)
- })
+});
+
+const db = mongoose.connection;
+
+db.once("open", () => {
+    console.log("connected to db");
+});
+
+db.on("error", (err) => {
+    console.error(err);
+});
+
+app.listen(port, () => {
+    console.log(`listening to port ${port}`);
+});
