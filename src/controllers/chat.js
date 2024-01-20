@@ -1,6 +1,6 @@
 const ChatMessage = require("../Models/chat");
 const Group = require("../Models/group");
-
+const User = require('../Models/UserModel')
 const  sendMessages =  async (req, res)=>{
      try {
           const { sender_id, recipient_id, group_id, content } = req.body;
@@ -28,6 +28,7 @@ const  sendMessages =  async (req, res)=>{
       
           // Save the chat message to the database
           await newChatMessage.save();
+          
       
           res.status(201).json({ message: 'Chat message sent successfully', data: newChatMessage });
         } catch (error) {
@@ -36,20 +37,14 @@ const  sendMessages =  async (req, res)=>{
         }
 }
 
-const createGroup = async (req,res)=>{
- try {
-    const { name, members } = req.body;
-
-//     // Check if members exist
-//     const membersExist = await User.find({ _id: { $in: members } });
-//     if (membersExist.length !== members.length) {
-//       return res.status(404).json({ error: 'One or more members not found' });
-//     }
+const createGroup = async (req, res) => {
+  try {
+    const { name, creatorId } = req.body;
 
     // Create a new group instance
     const newGroup = new Group({
       name,
-      members,
+      members: [creatorId], // Include the creator as a member
     });
 
     // Save the group to the database
@@ -60,29 +55,76 @@ const createGroup = async (req,res)=>{
     console.error('Error creating group:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
-}
+};
 
 
-const addMember = async (req, res) =>{
-     try {
-          const { userId } = req.body;
-          const { groupId } = req.params;
-      
-          // Check if the user and group exist
-          const userExist = await User.exists({ _id: userId });
-          const groupExist = await Group.exists({ _id: groupId });
-      
-          if (!userExist || !groupExist) {
-            return res.status(404).json({ error: 'User or Group not found' });
-          }
-      
-          // Update the group to add the user
-          await Group.findByIdAndUpdate(groupId, { $addToSet: { members: userId } });
-      
-          res.status(200).json({ message: 'User added to group successfully' });
-        } catch (error) {
-          console.error('Error adding user to group:', error);
-          res.status(500).json({ error: 'Internal Server Error' });
-        }
-}
-module.exports = {sendMessages,createGroup,addMember}
+const getGroupsForUser = async (req, res) => {
+  try {
+    const userId = req.params.userId; 
+
+    // Find all groups where the user is a member
+    const userGroups = await Group.find({ members: userId });
+
+    res.status(200).json({ data: userGroups });
+  } catch (error) {
+    console.error('Error fetching user groups:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+const addMember = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const { groupId } = req.params;
+
+    // Check if the group exists
+    const groupExist = await Group.exists({ _id: groupId });
+
+    if (!groupExist) {
+      return res.status(404).json({ error: 'Group not found' });
+    }
+
+    // Check if the user exists
+    const userExist = await User.exists({ _id: userId });
+
+    if (!userExist) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    await Group.findByIdAndUpdate(groupId, { $addToSet: { members: userId } });
+
+    // Retrieve the updated group data with the new member information
+    const updatedGroup = await Group.findById(groupId).populate('members');
+
+    res.status(200).json({ message: 'User added to group successfully', data: updatedGroup });
+  } catch (error) {
+    console.error('Error adding user to group:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+const getChatMessages = async (req, res) => {
+  try {
+    const chatMessages = await ChatMessage.find()
+      .populate('sender_id')
+      .populate('recipient_id')
+      .exec();
+
+    // Log details for each chat message
+    chatMessages.forEach((message) => {
+      console.log(`Message ID: ${message._id}`);
+      console.log(`Sender: ${message.sender_id.username} (${message.sender_id.email})`);
+      console.log(`Recipient: ${message.recipient_id ? message.recipient_id.username : 'N/A'}`);
+      console.log(`Content: ${message.content}`);
+      console.log(`Timestamp: ${message.timestamp}`);
+      console.log('------------------------');
+    });
+
+    res.status(200).json({ data: chatMessages });
+  } catch (error) {
+    console.error('Error fetching chat messages:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+module.exports = {sendMessages,createGroup,addMember,getGroupsForUser,getChatMessages}
