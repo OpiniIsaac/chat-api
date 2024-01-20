@@ -1,6 +1,6 @@
 const Benefit = require("../Models/Benefit")
 
-const  getUsers =  async (req, res)=>{
+const  getBenefits =  async (req, res)=>{
     try{
      const benefits = await Benefit.find();
 
@@ -14,7 +14,7 @@ const  getUsers =  async (req, res)=>{
 }
 }
 
-const  getSingleUser =  async (req, res)=>{
+const  getSingleBenefit =  async (req, res)=>{
    try {
       const benefit = await Benefit.findOne({ _id: req.params.id });
   
@@ -27,7 +27,7 @@ const  getSingleUser =  async (req, res)=>{
      res.status(500).json({ message:" benefit cant be found", errorMessage:error.message});
     }
  }
-const addUser = async (req,res)=>{
+const addBenefit = async (req,res)=>{
      try {
          const {name, description,  eligibilityCriteria} = req.body;
           const benefit= new Benefit({
@@ -43,7 +43,7 @@ const addUser = async (req,res)=>{
      }
 } 
 
-const updateUser = async (req, res)=>{
+const updateBenefit = async (req, res)=>{
      try {
           const benefit = await Benefit
           .findOneAndUpdate(
@@ -63,4 +63,4 @@ const updateUser = async (req, res)=>{
 }
 
 
-module.exports = {getUsers, addUser,updateUser,getSingleUser}
+module.exports = {getBenefits, addBenefit,updateBenefit,getSingleBenefit}

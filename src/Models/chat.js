@@ -10,6 +10,10 @@ const chatMessageSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
+  group_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Group',
+  },
   content: {
     type: String,
     required: true,
