@@ -1,6 +1,7 @@
 const ChatMessage = require("../Models/chat");
 const Group = require("../Models/group");
 const User = require('../Models/UserModel')
+
 const  sendMessages =  async (req, res)=>{
      try {
           const { sender_id, recipient_id, group_id, content } = req.body;
@@ -60,7 +61,7 @@ const createGroup = async (req, res) => {
 
 const getGroupsForUser = async (req, res) => {
   try {
-    const userId = req.params.userId; 
+    const userId = req.body.userId; 
 
     // Find all groups where the user is a member
     const userGroups = await Group.find({ members: userId });
@@ -126,5 +127,31 @@ const getChatMessages = async (req, res) => {
   }
 };
 
+const getChatMessagesForUserOrGroup = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-module.exports = {sendMessages,createGroup,addMember,getGroupsForUser,getChatMessages}
+    if (!id) {
+      return res.status(400).json({ error: 'Invalid request. Please provide a valid group ID' });
+    }
+
+    const query = { group_id: id };
+
+    const groupMessages = await ChatMessage.find(query)
+      .populate('sender_id')
+      .populate('recipient_id')
+      .populate('group_id')
+      .exec();
+
+    res.status(200).json({ data: groupMessages });
+  } catch (error) {
+    console.error('Error fetching chat messages:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+
+
+
+module.exports = {sendMessages,createGroup,addMember,getGroupsForUser,getChatMessages,getChatMessagesForUserOrGroup}

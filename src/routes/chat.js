@@ -4,8 +4,12 @@ const router = Router();
 
 router.post('/',controller.sendMessages)
 router.get('/',controller.getChatMessages)
-
+router.get('/group/:id',controller.getChatMessagesForUserOrGroup)
 router.post('/groups',controller.createGroup)
-router.get('/groups',controller.getGroupsForUser)
+router.get('/groups/:id',controller.getGroupsForUser)
 router.post('/groups/:groupId/members', controller.addMember)
+
+
+router.get('/messages/:id', controller.getChatMessagesForUserOrGroup)
+
 module.exports = router

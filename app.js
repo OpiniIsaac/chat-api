@@ -20,7 +20,7 @@ app.use(express.json());
   
 app.use('/api/v1/users', userRoute);
 app.use('/api/v1/benefits', benefitRoute);
-app.use('/api/v1/chat/', chatMessageRoute);
+app.use('/api/v1/chat', chatMessageRoute);
 mongoose.connect(config.database, {
     useNewUrlParser: true,
     useUnifiedTopology: true
