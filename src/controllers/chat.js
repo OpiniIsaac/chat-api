@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const ChatMessage = require("../Models/chat");
 const Group = require("../Models/group");
 const User = require('../Models/UserModel')
@@ -61,10 +62,17 @@ const createGroup = async (req, res) => {
 
 const getGroupsForUser = async (req, res) => {
   try {
-    const userId = req.body.userId; 
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ error: 'Invalid request. Please provide a valid user ID' });
+    }
+
+    // Convert userId to ObjectId
+    const userObjectId = new mongoose.Types.ObjectId(id);
 
     // Find all groups where the user is a member
-    const userGroups = await Group.find({ members: userId });
+    const userGroups = await Group.find({ members: userObjectId });
 
     res.status(200).json({ data: userGroups });
   } catch (error) {
