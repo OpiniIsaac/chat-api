@@ -12,11 +12,7 @@ const mongoose = require("mongoose");
 app.use(cors());
 // Use express.json() for parsing JSON bodies
 app.use(express.json());
-// app.use(cors({
-//     origin: 'http://localhost:5173/', // Replace with your actual frontend domain
-//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-//     credentials: true,
-//   }));
+
   
 app.use('/api/v1/users', userRoute);
 app.use('/api/v1/benefits', benefitRoute);
