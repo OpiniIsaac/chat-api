@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema({
   department: {
     type: String,
   },
+  passwordHash: {
+    type: String,
+  },
+  
 });
 
 const User = mongoose.model('User', userSchema);

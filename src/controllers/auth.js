@@ -36,7 +36,7 @@ const  login  =async (req, res) => {
         role = "Employee";
       } 
      
-      res.status(200).json({ message: "Login successful", role });
+      res.status(200).json({ user });
     } catch (error) {
       res
         .status(400)

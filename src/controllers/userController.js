@@ -31,6 +31,7 @@ const addUser = async (req,res)=>{
                department,
                email,
                role
+               
           })
           await user.save()
           res.status(200).json({ message:"user added as a successfully",user});

@@ -159,7 +159,35 @@ const getChatMessagesForUserOrGroup = async (req, res) => {
 };
 
 
+const getGroupById = async (req, res) => {
+  const groupId = req.params.id;
+
+  try {
+    // Validate if groupId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(groupId)) {
+      return res.status(400).json({ message: 'Invalid group ID' });
+    }
+
+    // Find the group by ID
+    const group = await Group.findById(groupId);
+
+    // Check if the group exists
+    if (!group) {
+      return res.status(404).json({ message: 'Group not found' });
+    }
+
+    // Send the group as a response
+    res.status(200).json({ data: group });
+  } catch (error) {
+    console.error('Error fetching group by ID:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+module.exports = {
+  getGroupById,
+};
 
 
 
-module.exports = {sendMessages,createGroup,addMember,getGroupsForUser,getChatMessages,getChatMessagesForUserOrGroup}
+module.exports = {sendMessages,createGroup,addMember,getGroupsForUser,getChatMessages,getChatMessagesForUserOrGroup,getGroupById}
